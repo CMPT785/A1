@@ -10,6 +10,8 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -node
 3. Install dependencies using `pip install -r requirements.txt`
 4. Run the application using `python app.py`
 
+---
+---
 
 ## Assignment Description:
 
