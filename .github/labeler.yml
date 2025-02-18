@@ -1,0 +1,7 @@
+Documentation:
+- changed-files:
+  - any-glob-to-any-file: '**/*.md'
+
+Code Change:
+- changed-files:
+  - any-glob-to-any-file: '*.py'
