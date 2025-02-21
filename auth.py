@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import logging
+import re
 from security import validate_input
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -19,6 +20,17 @@ limiter = Limiter(
     on_breach=rate_limit_exceeded
 )
 
+def validate_password(password):
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long."
+    if not re.search(r"[A-Z]", password):
+        return False, "Password must contain at least one uppercase letter."
+    if not re.search(r"[a-z]", password):
+        return False, "Password must contain at least one lowercase letter."
+    if not re.search(r"[0-9]", password):
+        return False, "Password must contain at least one number."
+    return True, ""
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -29,6 +41,11 @@ def register():
     password = data.get('password')
     if not username or not password:
         return jsonify({'error': 'Username and password are required', 'status': 400}), 400
+    
+    is_valid_password, password_error_message = validate_password(password)
+    if not is_valid_password:
+        return jsonify({'error': password_error_message, 'status': 400}), 400
+    
     hashed_password = generate_password_hash(password)
     try:
         with sqlite3.connect('users.db') as conn:
@@ -77,6 +94,11 @@ def change_password():
     new_password = data.get('new_password')
     if not username or not old_password or not new_password:
         return jsonify({'error': 'All fields are required', 'status': 400}), 400
+    
+    is_valid_password, password_error_message = validate_password(new_password)
+    if not is_valid_password:
+        return jsonify({'error': password_error_message, 'status': 400}), 400
+    
     with sqlite3.connect('users.db') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
