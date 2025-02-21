@@ -58,7 +58,7 @@ def register():
         return jsonify({'error': 'Username already exists', 'status': 400}), 400
 
 @auth_bp.route('/login', methods=['POST'])
-@limiter.limit("5 per minute")  # Add rate limiting to the login route
+@limiter.limit("10 per minute")  # Add rate limiting to the login route
 def login():
     data = request.get_json()
     is_valid, error_message = validate_input(data)
@@ -82,7 +82,7 @@ def login():
         return jsonify({'error': 'Invalid credentials', 'status': 401}), 401
 
 @auth_bp.route('/changepw', methods=['POST'])
-@limiter.limit("2 per day")  # Add rate limiting to the change password route
+@limiter.limit("10 per day")  # Add rate limiting to the change password route
 def change_password():
     data = request.get_json()
     logging.debug(f'Received change password request: {data.get("username")}')

@@ -14,7 +14,7 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -node
 
 ## Changelog 02/20/2024
 - Added `Server` header obfuscation
-- Added rate limiting (max 5/ per min) on `/login` and `/changepw` routes
+- Added rate limiting (max 10/ per min) on `/login` and `/changepw` routes
 - Added Password security requirements (8 characters min, atleast 1 uppercase and lowercase letter)
 
 ## Assignment Description:
