@@ -3,8 +3,21 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import logging
 from security import validate_input
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 auth_bp = Blueprint('auth', __name__)
+
+# Custom handler for rate limit breaches
+def rate_limit_exceeded(e):
+    return jsonify({'error': 'Max attempts exceeded. Please try again later.', 'status': 429}), 429
+
+# Initialize the Limiter
+limiter = Limiter(
+    get_remote_address,
+    default_limits=["40 per day", "5 per hour"],
+    on_breach=rate_limit_exceeded
+)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -28,6 +41,7 @@ def register():
         return jsonify({'error': 'Username already exists', 'status': 400}), 400
 
 @auth_bp.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")  # Add rate limiting to the login route
 def login():
     data = request.get_json()
     is_valid, error_message = validate_input(data)
@@ -51,6 +65,7 @@ def login():
         return jsonify({'error': 'Invalid credentials', 'status': 401}), 401
 
 @auth_bp.route('/changepw', methods=['POST'])
+@limiter.limit("2 per day")  # Add rate limiting to the change password route
 def change_password():
     data = request.get_json()
     logging.debug(f'Received change password request: {data.get("username")}')

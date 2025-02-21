@@ -12,6 +12,10 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -node
 
 ---
 
+## Changelog 02/20/2024
+- Added 'Server' header obfuscation
+- Added rate limiting (max 5/ per min) on /login and /changepw routes
+
 ## Assignment Description:
 
 In this assignment, you will practice security patterns by using best practices in developing a simple API user control panel.
@@ -68,3 +72,4 @@ Here is a minimal list of security details that you must include in your impleme
 - Password management: store passwords securely
 - Input Validation and Sanitization
 - Security headers
+
